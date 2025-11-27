@@ -1,0 +1,34 @@
+name: BUILD API TEST
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "apps/api"
+      - ".github/workflows/basic-api-build.yml"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Use node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: install dependencies
+        run: pnpm install --prod --frozen-lockfile
+
+      - name: build project
+        run: pnpm build
