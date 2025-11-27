@@ -30,5 +30,8 @@ jobs:
       - name: install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma Client
+        run: npx prisma generate --schema=./apps/api/prisma/schema.prisma
+
       - name: build project
         run: pnpm --filter api build
