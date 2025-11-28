@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'generated/prisma';
 import { SignUpDto } from './dto/sign-up.dto';
+import { UserWithoutPass } from 'src/common/types/user.type';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: Omit<User, 'password'>) {
+  async login(user: UserWithoutPass) {
     const payload = { email: user.email, sub: user.id };
 
     return {
