@@ -5,7 +5,8 @@
     "dev:api": "pnpm --filter api start:dev",
     "dev:web": "pnpm --filter web dev",
     "dev:db": "docker compose -f infra/docker-compose.dev.yml up -d",
-    "dev": "pnpm dev:db && concurrently -k \"pnpm dev:api\" \"pnpm dev:web\""
+    "dev": "pnpm dev:db && concurrently -k \"pnpm dev:api\" \"pnpm dev:web\"",
+    "api": "pnpm --filter api"
   },
   "devDependencies": {
     "concurrently": "9.0.1"
