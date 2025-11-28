@@ -131,28 +131,8 @@ export class ExpensesService {
   }
 
   async remove(id: string) {
-    try {
-      const deleteExpenseTags = this.prisma.expenseTags.deleteMany({
-        where: {
-          expenseId: id,
-        },
-      });
-
-      const deleteExpense = this.prisma.expense.delete({ where: { id } });
-
-      await this.prisma.$transaction([deleteExpenseTags, deleteExpense]);
-
-      return 'expense deleted successfully';
-    } catch (error) {
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException('Expense with the provided id not found');
-      }
-
-      throw new InternalServerErrorException();
-    }
+    await this.prisma.expense.delete({ where: { id } });
+    return;
   }
 
   toDto(expense: Expense) {
