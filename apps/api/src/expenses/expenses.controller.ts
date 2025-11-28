@@ -14,6 +14,8 @@ import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ExpensesPaginationQueryDto } from './dto/expenses-pagination-query.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { type UserRequest } from 'src/auth/interfaces/jwt-payload.interface';
 
 @Controller('expenses')
 export class ExpensesController {
@@ -25,8 +27,11 @@ export class ExpensesController {
   }
 
   @Get()
-  findAll(@Req() req, @Query() query: ExpensesPaginationQueryDto) {
-    return this.expensesService.findAll(req.user.id, query);
+  findAll(
+    @CurrentUser() currentUser: UserRequest,
+    @Query() query: ExpensesPaginationQueryDto,
+  ) {
+    return this.expensesService.findAll(currentUser.id, query);
   }
 
   @Get(':id')

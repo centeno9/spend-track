@@ -34,7 +34,7 @@ export class ExpensesService {
         totalCents,
         description,
         userId,
-        expenseTags: {
+        tags: {
           create: tagIds.map((tagId) => ({ tagId })),
         },
       },
@@ -72,7 +72,7 @@ export class ExpensesService {
         take: limit,
         where: whereCondition,
         include: {
-          expenseTags: true,
+          tags: { include: { tag: true } },
         },
         orderBy: {
           expensedAt: 'asc',
@@ -105,7 +105,7 @@ export class ExpensesService {
   async findOne(id: string) {
     const expense = await this.prisma.expense.findUnique({
       where: { id: id },
-      include: { user: true, expenseTags: true },
+      include: { user: true, tags: { include: { tag: true } } },
     });
 
     if (!expense)
@@ -135,7 +135,7 @@ export class ExpensesService {
     return;
   }
 
-  toDto(expense: Expense) {
+  private toDto(expense: Expense) {
     return mapToDto(ExpenseDto, expense, { excludeExtraneousValues: true });
   }
 }

@@ -46,7 +46,7 @@ model Expense {
   description String?       @db.VarChar(256)
   createdAt   DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime      @updatedAt @db.Timestamptz(6)
-  expenseTags ExpenseTags[]
+  tags        ExpenseTags[]
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expensedAt])
