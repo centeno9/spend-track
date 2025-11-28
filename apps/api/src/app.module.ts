@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { TagsModule } from './tags/tags.module';
+import { AppConfigModule } from './app-config/app-config.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    AppConfigModule,
     UsersModule,
-    PrismaModule,
     AuthModule,
+    PrismaModule,
     ExpensesModule,
     TagsModule,
   ],
