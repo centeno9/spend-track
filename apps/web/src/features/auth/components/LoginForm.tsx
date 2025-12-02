@@ -1,24 +1,43 @@
-import { cn } from "@/shared/lib/utils"
-import { Button } from "@/shared/components/ui/button"
+"use client";
+
+import { cn } from "@/shared/lib/utils";
+import { Button } from "@/shared/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card"
+} from "@/shared/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/shared/components/ui/field"
-import { Input } from "@/shared/components/ui/input"
+} from "@/shared/components/ui/field";
+import { Input } from "@/shared/components/ui/input";
+import {
+  loginAction,
+  type LoginActionState,
+} from "@/features/auth/server/actions";
+import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
+
+const initialState: LoginActionState = {
+  error: undefined,
+  searchParams: "",
+};
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const searchParams = useSearchParams();
+  const [state, formAction] = useActionState(loginAction, {
+    ...initialState,
+    searchParams: searchParams.toString(),
+  });
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -29,12 +48,13 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={formAction}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -50,8 +70,17 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </Field>
+              {state?.error ? (
+                <p
+                  className="text-sm text-destructive"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  {state.error}
+                </p>
+              ) : null}
               <Field>
                 <Button type="submit">Login</Button>
                 <Button variant="outline" type="button">
@@ -66,5 +95,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

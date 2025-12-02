@@ -1,4 +1,4 @@
-import { LoginForm } from "@/shared/components/login-form"
+import { LoginForm } from "@/features/auth";
 
 export default function Page() {
   return (
@@ -7,5 +7,5 @@ export default function Page() {
         <LoginForm />
       </div>
     </div>
-  )
+  );
 }
