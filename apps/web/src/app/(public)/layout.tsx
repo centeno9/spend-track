@@ -1,4 +1,4 @@
-import Navbar from "@/components/ui/navbar";
+import Navbar from "@/shared/components/ui/navbar";
 import { ReactNode } from "react";
 
 const PublicLayout = ({ children }: { children: ReactNode }) => {
