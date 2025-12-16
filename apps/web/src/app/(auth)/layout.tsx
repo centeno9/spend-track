@@ -1,49 +1,45 @@
+import { User, UserStoreProvider } from "@/features/user";
+import { getUserProfile } from "@/features/user/api/get-profile";
 import { AppSidebar } from "@/shared/components/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/shared/components/ui/breadcrumb";
-import { Separator } from "@/shared/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/shared/components/ui/sidebar";
+import { ApiError } from "@/shared/lib/api-client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
-  return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
-  );
+export default async function AuthLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const cookieStore = await cookies();
+  const authToken = cookieStore.get("authToken")?.value;
+  if (!authToken) redirect("/login");
+
+  try {
+    const user = await getUserProfile(authToken);
+    return (
+      <UserStoreProvider user={user}>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+              </div>
+            </header>
+            {children}
+          </SidebarInset>
+        </SidebarProvider>
+      </UserStoreProvider>
+    );
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      redirect("/api/auth/logout");
+    }
+  }
 }

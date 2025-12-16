@@ -15,15 +15,9 @@ import {
   SidebarRail,
 } from "@/shared/components/ui/sidebar";
 import Link from "next/link";
+import { useUserStore } from "@/features/user";
 
-// This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-
   navMain: [
     {
       title: "Dashboard",
@@ -50,6 +44,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { currentUser } = useUserStore((state) => state);
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="overflow-hidden">
@@ -72,7 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={currentUser} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

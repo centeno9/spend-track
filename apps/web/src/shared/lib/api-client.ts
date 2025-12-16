@@ -21,11 +21,15 @@ export async function apiClient<TResponse>(
     method?: HttpMethod;
     body?: unknown;
     headers?: Record<string, string>;
+    localApi?: boolean;
   } = {}
 ): Promise<TResponse> {
-  const { method = "GET", body, headers = {} } = options;
+  const { method = "GET", body, headers = {}, localApi = false } = options;
 
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const url = `${localApi ? "http://localhost:3000/api" : BASE_URL}${path}`;
+
+  console.log("url", url);
+  const res = await fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",

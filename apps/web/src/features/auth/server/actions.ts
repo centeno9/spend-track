@@ -24,12 +24,15 @@ export async function loginAction(
   try {
     const { accessToken } = await login(email, password);
 
+    console.log("accessToken", accessToken);
+
     const cookieManager = await cookies();
 
     cookieManager.set("authToken", accessToken, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       path: "/",
+      sameSite: "lax",
     });
   } catch (error) {
     if (error instanceof ApiError) {
@@ -54,8 +57,5 @@ export async function loginAction(
 }
 
 export async function logoutAction() {
-  const cookieStore = await cookies();
-
-  cookieStore.delete("authToken");
-  redirect("/");
+  redirect("/api/auth/logout");
 }
