@@ -20,8 +20,8 @@ import {
   loginAction,
   type LoginActionState,
 } from "@/features/auth/server/actions";
-import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useActionState } from "react";
 
 const initialState: LoginActionState = {
   error: undefined,
@@ -38,6 +38,11 @@ export function LoginForm({
     searchParams: searchParams.toString(),
   });
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    formAction(new FormData(event.currentTarget));
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -48,7 +53,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={formAction}>
+          <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
