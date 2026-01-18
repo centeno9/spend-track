@@ -8,11 +8,20 @@ interface DateRange {
 /**
  * Formats a Date object to YYYY-MM-DD string
  */
-function formatToYYYYMMDD(date: Date): string {
+export function formatToYYYYMMDD(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Parses a YYYY-MM-DD string as a local date (not UTC)
+ * This avoids timezone issues when parsing date-only strings
+ */
+export function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 /**
@@ -130,8 +139,8 @@ export function getDateRangeForMode(
  * Formats a date range for display
  */
 export function formatDateRangeDisplay(startDate: string, endDate: string): string {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const start = parseLocalDate(startDate);
+  const end = parseLocalDate(endDate);
 
   const formatter = new Intl.DateTimeFormat("en-US", {
     month: "2-digit",

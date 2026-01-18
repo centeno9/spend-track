@@ -3,6 +3,7 @@ import {
   ControlBar,
   DashHeader,
   ExpenseFiltersStoreProvider,
+  TagFilter,
   Totalizers,
 } from "@/features/dashboard";
 
@@ -13,6 +14,7 @@ export default function Page() {
         <DashHeader />
         <Totalizers />
         <ControlBar />
+        <TagFilter />
         <Chart />
       </ExpenseFiltersStoreProvider>
     </div>

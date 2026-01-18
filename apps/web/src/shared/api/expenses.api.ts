@@ -1,4 +1,6 @@
 import type {
+  CreateExpensePayload,
+  Expense,
   ExpensesQueryParams,
   ExpensesResponse,
 } from "@/shared/types/expense.types";
@@ -14,6 +16,8 @@ export async function fetchExpenses(
   if (params.page) queryParams.set("page", params.page.toString());
   if (params.includeSummary !== undefined)
     queryParams.set("includeSummary", params.includeSummary.toString());
+  if (params.tagIds?.length)
+    queryParams.set("tagIds", params.tagIds.join(","));
 
   const queryString = queryParams.toString();
   const url = `/api/expenses${queryString ? `?${queryString}` : ""}`;
@@ -23,6 +27,25 @@ export async function fetchExpenses(
   if (!res.ok) {
     const error = await res.json().catch(() => ({ error: "Failed to fetch" }));
     throw new Error(error.error || "Failed to fetch expenses");
+  }
+
+  return res.json();
+}
+
+export async function createExpense(
+  payload: CreateExpensePayload
+): Promise<Expense> {
+  const res = await fetch("/api/expenses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: "Failed to create" }));
+    throw new Error(error.message || "Failed to create expense");
   }
 
   return res.json();

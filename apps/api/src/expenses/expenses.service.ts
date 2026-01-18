@@ -50,6 +50,7 @@ export class ExpensesService {
       startDate,
       endDate,
       includeSummary = false,
+      tagIds,
     } = queryDto;
 
     const skip = page === 1 ? 0 : limit * (page - 1);
@@ -61,6 +62,15 @@ export class ExpensesService {
             expensedAt: {
               ...(startDate ? { gte: startDate } : {}),
               ...(endDate ? { lte: endDate } : {}),
+            },
+          }
+        : {}),
+      ...(tagIds?.length
+        ? {
+            tags: {
+              some: {
+                tagId: { in: tagIds },
+              },
             },
           }
         : {}),
