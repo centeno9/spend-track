@@ -43,3 +43,16 @@ export interface ExpensesQueryParams {
   page?: number;
   includeSummary?: boolean;
 }
+
+export interface CreateExpensePayload {
+  total: number; // Dollar amount (e.g., 12.50)
+  expensedAt: string; // ISO date string
+  title: string;
+  description?: string;
+  tagIds?: string[];
+}
+
+export interface CreateTagPayload {
+  name: string;
+  color: string; // Hex color (e.g., "#FF5733")
+}
