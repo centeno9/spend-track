@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { useExpenses } from "@/shared/hooks/useExpenses";
 import { useExpenseFiltersStore } from "../providers/expense-filters.provider";
+import { parseLocalDate, formatToYYYYMMDD } from "@/shared/lib/date.utils";
 
 interface ChartDataPoint {
   name: string; // Date label
@@ -38,12 +39,12 @@ export const Chart = () => {
     const dataMap = new Map<string, number>();
 
     // Initialize map with all days in range (to show 0s)
-    const current = new Date(startDate);
-    const end = new Date(endDate);
+    const current = parseLocalDate(startDate);
+    const end = parseLocalDate(endDate);
     // Safety check: prevent infinite loop if dates are weird
     let safetyCounter = 0;
     while (current <= end && safetyCounter < 365) {
-      const key = current.toISOString().split("T")[0];
+      const key = formatToYYYYMMDD(current);
       dataMap.set(key, 0);
       current.setDate(current.getDate() + 1);
       safetyCounter += 1;
@@ -51,14 +52,15 @@ export const Chart = () => {
 
     // Fill with actual expense data
     data.data.forEach((expense) => {
-      const key = new Date(expense.expensedAt).toISOString().split("T")[0];
+      // expense.expensedAt is already YYYY-MM-DD from the API
+      const key = expense.expensedAt.split("T")[0];
       if (dataMap.has(key)) {
         dataMap.set(key, (dataMap.get(key) || 0) + expense.total);
       }
     });
 
     return Array.from(dataMap.entries()).map(([date, amount]) => ({
-      name: new Date(date).toLocaleDateString("en-US", {
+      name: parseLocalDate(date).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
       }),
