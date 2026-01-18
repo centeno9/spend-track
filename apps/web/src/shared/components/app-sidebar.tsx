@@ -50,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="overflow-hidden">
         <p className="text-3xl font-bold text-center">SpendTrack</p>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-white">
         <SidebarGroup>
           <SidebarMenu>
             {data.navMain.map((item) => (
