@@ -42,6 +42,7 @@ export interface ExpensesQueryParams {
   limit?: number;
   page?: number;
   includeSummary?: boolean;
+  tagIds?: string[];
 }
 
 export interface CreateExpensePayload {

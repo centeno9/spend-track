@@ -11,6 +11,7 @@ export const Totalizers = () => {
   const startDate = useExpenseFiltersStore((state) => state.startDate);
   const endDate = useExpenseFiltersStore((state) => state.endDate);
   const rangeMode = useExpenseFiltersStore((state) => state.rangeMode);
+  const tagIds = useExpenseFiltersStore((state) => state.tagsId);
 
   // Calculate current year date range
   const currentYear = new Date().getFullYear();
@@ -21,6 +22,7 @@ export const Totalizers = () => {
   const { data: rangeData, isLoading: rangeLoading } = useExpenses({
     startDate,
     endDate,
+    tagIds: tagIds.length > 0 ? tagIds : undefined,
     includeSummary: true,
   });
 
@@ -28,6 +30,7 @@ export const Totalizers = () => {
   const { data: yearData, isLoading: yearLoading } = useExpenses({
     startDate: yearStartDate,
     endDate: yearEndDate,
+    tagIds: tagIds.length > 0 ? tagIds : undefined,
     includeSummary: true,
   });
 

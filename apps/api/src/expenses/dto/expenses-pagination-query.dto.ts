@@ -1,5 +1,11 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsNumber, IsOptional } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ToBoolean } from 'src/common/decorators/to-boolean.decorator';
 
 export class ExpensesPaginationQueryDto {
@@ -27,4 +33,11 @@ export class ExpensesPaginationQueryDto {
   @ToBoolean()
   @IsBoolean()
   includeSummary?: boolean;
+
+  @IsOptional()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.split(',').filter(Boolean) : value,
+  )
+  @IsString({ each: true })
+  tagIds?: string[];
 }

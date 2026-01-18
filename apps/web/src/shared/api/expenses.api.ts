@@ -16,6 +16,8 @@ export async function fetchExpenses(
   if (params.page) queryParams.set("page", params.page.toString());
   if (params.includeSummary !== undefined)
     queryParams.set("includeSummary", params.includeSummary.toString());
+  if (params.tagIds?.length)
+    queryParams.set("tagIds", params.tagIds.join(","));
 
   const queryString = queryParams.toString();
   const url = `/api/expenses${queryString ? `?${queryString}` : ""}`;
