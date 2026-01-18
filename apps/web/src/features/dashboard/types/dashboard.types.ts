@@ -1,0 +1,1 @@
+export type DateRangeOption = 'today' | 'week' | 'month' | 'custom';
