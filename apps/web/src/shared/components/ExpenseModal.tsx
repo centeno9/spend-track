@@ -13,9 +13,10 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { useTags } from "@/shared/hooks/useTags";
 import { useCreateExpense } from "@/shared/hooks/useCreateExpense";
+import { useUpdateExpense } from "@/shared/hooks/useUpdateExpense";
 import { useCreateTag } from "@/shared/hooks/useCreateTag";
 import { cn } from "@/shared/lib/utils";
-import type { Tag } from "@/shared/types/expense.types";
+import type { Expense, Tag } from "@/shared/types/expense.types";
 
 const PRESET_COLORS = [
   "#EF4444", // Red
@@ -30,12 +31,15 @@ const PRESET_COLORS = [
   "#6B7280", // Gray
 ] as const;
 
-interface AddExpenseModalProps {
+interface ExpenseModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  expense?: Expense; // If provided, modal is in edit mode
 }
 
-export function AddExpenseModal({ open, onOpenChange }: AddExpenseModalProps) {
+export function ExpenseModal({ open, onOpenChange, expense }: ExpenseModalProps) {
+  const isEditMode = !!expense;
+
   // Form state
   const [amount, setAmount] = useState("");
   const [title, setTitle] = useState("");
@@ -51,21 +55,32 @@ export function AddExpenseModal({ open, onOpenChange }: AddExpenseModalProps) {
   // Hooks
   const { data: tags = [], isLoading: tagsLoading } = useTags();
   const createExpense = useCreateExpense();
+  const updateExpense = useUpdateExpense();
   const createTag = useCreateTag();
 
-  // Reset form when modal opens
+  // Initialize form when modal opens
   useEffect(() => {
     if (open) {
-      setAmount("");
-      setTitle("");
-      setDescription("");
-      setDate(new Date().toISOString().split("T")[0]);
-      setSelectedTagIds([]);
+      if (expense) {
+        // Edit mode - populate with existing expense data
+        setAmount(expense.total.toString());
+        setTitle(expense.title);
+        setDescription(expense.description || "");
+        setDate(expense.expensedAt.split("T")[0]);
+        setSelectedTagIds(expense.tags.map((tag) => tag.id));
+      } else {
+        // Create mode - reset to defaults
+        setAmount("");
+        setTitle("");
+        setDescription("");
+        setDate(new Date().toISOString().split("T")[0]);
+        setSelectedTagIds([]);
+      }
       setIsCreatingTag(false);
       setNewTagName("");
       setNewTagColor(PRESET_COLORS[0]);
     }
-  }, [open]);
+  }, [open, expense]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -77,19 +92,32 @@ export function AddExpenseModal({ open, onOpenChange }: AddExpenseModalProps) {
       if (isNaN(parsedAmount) || parsedAmount <= 0) return;
 
       try {
-        await createExpense.mutateAsync({
-          total: parsedAmount,
-          title: title.trim(),
-          expensedAt: date,
-          description: description.trim() || undefined,
-          tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
-        });
+        if (isEditMode && expense) {
+          await updateExpense.mutateAsync({
+            id: expense.id,
+            payload: {
+              total: parsedAmount,
+              title: title.trim(),
+              expensedAt: date,
+              description: description.trim() || undefined,
+              tagIds: selectedTagIds,
+            },
+          });
+        } else {
+          await createExpense.mutateAsync({
+            total: parsedAmount,
+            title: title.trim(),
+            expensedAt: date,
+            description: description.trim() || undefined,
+            tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
+          });
+        }
         onOpenChange(false);
       } catch {
         // Error handling can be enhanced with toast notifications
       }
     },
-    [amount, title, date, description, selectedTagIds, createExpense, onOpenChange]
+    [amount, title, date, description, selectedTagIds, isEditMode, expense, createExpense, updateExpense, onOpenChange]
   );
 
   const handleCreateTag = useCallback(async () => {
@@ -116,13 +144,13 @@ export function AddExpenseModal({ open, onOpenChange }: AddExpenseModalProps) {
     );
   }, []);
 
-  const isSubmitting = createExpense.isPending;
+  const isSubmitting = createExpense.isPending || updateExpense.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>Add New Expense</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Expense" : "Add New Expense"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto pr-1">
@@ -248,7 +276,10 @@ export function AddExpenseModal({ open, onOpenChange }: AddExpenseModalProps) {
             className="w-full"
             disabled={isSubmitting || !amount || !title}
           >
-            {isSubmitting ? "Adding..." : "Add Expense"}
+            {isSubmitting
+              ? isEditMode ? "Saving..." : "Adding..."
+              : isEditMode ? "Save Changes" : "Add Expense"
+            }
           </Button>
         </form>
       </DialogContent>

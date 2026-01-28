@@ -56,6 +56,17 @@ export class ExpensesService {
 
     const skip = page === 1 ? 0 : limit * (page - 1);
 
+    // Build tag filter conditions - require ALL selected tags (AND logic)
+    const tagConditions = tagIds?.length
+      ? tagIds.map((tagId) => ({
+          tags: {
+            some: {
+              tagId: tagId,
+            },
+          },
+        }))
+      : [];
+
     const whereCondition = {
       userId,
       ...(startDate || endDate
@@ -66,15 +77,7 @@ export class ExpensesService {
             },
           }
         : {}),
-      ...(tagIds?.length
-        ? {
-            tags: {
-              some: {
-                tagId: { in: tagIds },
-              },
-            },
-          }
-        : {}),
+      ...(tagConditions.length > 0 ? { AND: tagConditions } : {}),
     };
 
     const [expenses, count, summaryArg] = await this.prisma.$transaction([
@@ -126,19 +129,38 @@ export class ExpensesService {
   }
 
   async update(id: string, updateExpenseDto: UpdateExpenseDto) {
-    const { total, ...data } = updateExpenseDto;
+    const { total, tagIds, ...data } = updateExpenseDto;
 
-    const updateExpense = await this.prisma.expense.update({
-      where: {
-        id,
-      },
-      data: {
-        ...data,
-        ...(total && { totalCents: fromDecimalToCents(total) }),
-      },
-    });
+    // If tagIds is provided, update tags by deleting existing and creating new
+    if (tagIds !== undefined) {
+      await this.prisma.$transaction([
+        // Delete existing tag relations
+        this.prisma.expenseTags.deleteMany({
+          where: { expenseId: id },
+        }),
+        // Update expense and create new tag relations
+        this.prisma.expense.update({
+          where: { id },
+          data: {
+            ...data,
+            ...(total !== undefined && { totalCents: fromDecimalToCents(total) }),
+            tags: {
+              create: tagIds.map((tagId) => ({ tagId })),
+            },
+          },
+        }),
+      ]);
+    } else {
+      await this.prisma.expense.update({
+        where: { id },
+        data: {
+          ...data,
+          ...(total !== undefined && { totalCents: fromDecimalToCents(total) }),
+        },
+      });
+    }
 
-    return this.toDto(updateExpense);
+    return this.findOne(id);
   }
 
   async remove(id: string) {

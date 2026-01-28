@@ -54,7 +54,20 @@ export interface CreateExpensePayload {
   tagIds?: string[];
 }
 
+export interface UpdateExpensePayload {
+  total?: number;
+  expensedAt?: string;
+  title?: string;
+  description?: string;
+  tagIds?: string[];
+}
+
 export interface CreateTagPayload {
   name: string;
   color: string; // Hex color (e.g., "#FF5733")
+}
+
+export interface UpdateTagPayload {
+  name?: string;
+  color?: string;
 }

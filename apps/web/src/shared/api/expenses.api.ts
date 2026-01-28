@@ -3,6 +3,7 @@ import type {
   Expense,
   ExpensesQueryParams,
   ExpensesResponse,
+  UpdateExpensePayload,
 } from "@/shared/types/expense.types";
 
 export async function fetchExpenses(
@@ -47,6 +48,26 @@ export async function createExpense(
   if (!res.ok) {
     const error = await res.json().catch(() => ({ error: "Failed to create" }));
     throw new Error(error.message || "Failed to create expense");
+  }
+
+  return res.json();
+}
+
+export async function updateExpense(
+  id: string,
+  payload: UpdateExpensePayload
+): Promise<Expense> {
+  const res = await fetch(`/api/expenses/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: "Failed to update" }));
+    throw new Error(error.message || "Failed to update expense");
   }
 
   return res.json();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import { AddExpenseModal } from "@/shared/components/AddExpenseModal";
+import { ExpenseModal } from "@/shared/components/ExpenseModal";
 import { TagFilter } from "@/shared/components/TagFilter";
 import { fetchExpenses } from "@/shared/api/expenses.api";
 import { useDeleteExpense } from "@/shared/hooks/useDeleteExpense";
@@ -24,7 +24,8 @@ const ITEMS_PER_PAGE = 20;
 
 export default function ExpensesPage() {
   // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
 
   // Filter state
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
@@ -64,7 +65,7 @@ export default function ExpensesPage() {
           </p>
         </div>
         <Button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsCreateModalOpen(true)}
           className="flex items-center gap-2 bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all hover:shadow-md active:scale-95"
         >
           <Plus size={18} />
@@ -85,10 +86,13 @@ export default function ExpensesPage() {
       ) : error ? (
         <ErrorState message={error.message} />
       ) : expenses.length === 0 ? (
-        <EmptyState onCreateClick={() => setIsModalOpen(true)} />
+        <EmptyState onCreateClick={() => setIsCreateModalOpen(true)} />
       ) : (
         <>
-          <ExpenseList expenses={expenses} />
+          <ExpenseList
+            expenses={expenses}
+            onEditClick={setExpenseToEdit}
+          />
           {totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
@@ -99,19 +103,39 @@ export default function ExpensesPage() {
         </>
       )}
 
-      {/* Modal */}
-      <AddExpenseModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      {/* Create Modal */}
+      <ExpenseModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
+
+      {/* Edit Modal */}
+      <ExpenseModal
+        open={!!expenseToEdit}
+        onOpenChange={(open) => !open && setExpenseToEdit(null)}
+        expense={expenseToEdit ?? undefined}
+      />
     </div>
   );
 }
 
 // Expense List Component
-function ExpenseList({ expenses }: { expenses: Expense[] }) {
+function ExpenseList({
+  expenses,
+  onEditClick,
+}: {
+  expenses: Expense[];
+  onEditClick: (expense: Expense) => void;
+}) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="divide-y divide-gray-100">
         {expenses.map((expense) => (
-          <ExpenseRow key={expense.id} expense={expense} />
+          <ExpenseRow
+            key={expense.id}
+            expense={expense}
+            onEditClick={() => onEditClick(expense)}
+          />
         ))}
       </div>
     </div>
@@ -119,7 +143,13 @@ function ExpenseList({ expenses }: { expenses: Expense[] }) {
 }
 
 // Individual Expense Row
-function ExpenseRow({ expense }: { expense: Expense }) {
+function ExpenseRow({
+  expense,
+  onEditClick,
+}: {
+  expense: Expense;
+  onEditClick: () => void;
+}) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const deleteExpense = useDeleteExpense();
 
@@ -167,10 +197,18 @@ function ExpenseRow({ expense }: { expense: Expense }) {
           )}
           <p className="text-xs text-gray-400 mt-1">{formattedDate}</p>
         </div>
-        <div className="flex items-center gap-4 ml-4">
-          <span className="text-lg font-semibold text-gray-900">
+        <div className="flex items-center gap-2 ml-4">
+          <span className="text-lg font-semibold text-gray-900 mr-2">
             {formatCurrency(expense.total)}
           </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onEditClick}
+            className="text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+          >
+            <Pencil size={16} />
+          </Button>
           <Button
             variant="ghost"
             size="sm"

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
-import { AddExpenseModal } from "@/shared/components/AddExpenseModal";
+import { ExpenseModal } from "@/shared/components/ExpenseModal";
 import { Plus } from "lucide-react";
 
 export const DashHeader = () => {
@@ -24,7 +24,7 @@ export const DashHeader = () => {
         New Expense
       </Button>
 
-      <AddExpenseModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      <ExpenseModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </header>
   );
 };

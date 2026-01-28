@@ -17,7 +17,7 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
-  const res = await fetch(`${API_URL}/expenses/${id}`, {
+  const res = await fetch(`${API_URL}/tags/${id}`, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  const res = await fetch(`${API_URL}/expenses/${id}`, {
+  const res = await fetch(`${API_URL}/tags/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
