@@ -18,6 +18,7 @@ export async function fetchExpenses(
     queryParams.set("includeSummary", params.includeSummary.toString());
   if (params.tagIds?.length)
     queryParams.set("tagIds", params.tagIds.join(","));
+  if (params.sortOrder) queryParams.set("sortOrder", params.sortOrder);
 
   const queryString = queryParams.toString();
   const url = `/api/expenses${queryString ? `?${queryString}` : ""}`;
@@ -49,4 +50,15 @@ export async function createExpense(
   }
 
   return res.json();
+}
+
+export async function deleteExpense(id: string): Promise<void> {
+  const res = await fetch(`/api/expenses/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: "Failed to delete" }));
+    throw new Error(error.message || "Failed to delete expense");
+  }
 }

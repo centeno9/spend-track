@@ -102,9 +102,50 @@ The web app uses Next.js App Router with a feature-based folder structure:
 
 ### API-Web Integration
 
-- Web app proxies API requests to `http://localhost:5000/api`
-- Authentication via JWT stored in httpOnly cookies
-- API routes in web app (`app/api/`) handle server-side API calls and cookie management
+The web app uses Next.js API routes as a proxy layer to communicate with the NestJS backend. This pattern:
+- Keeps the auth token secure in httpOnly cookies (not exposed to client JS)
+- Allows the frontend to make requests to `/api/*` without CORS issues
+- Centralizes authentication header injection
+
+**Proxy Pattern:**
+1. Client-side code calls Next.js API routes (e.g., `fetch('/api/expenses')`)
+2. Next.js route handlers in `app/api/` read the `authToken` cookie
+3. Route handlers forward requests to the NestJS API with `Authorization: Bearer <token>`
+4. Response is proxied back to the client
+
+**Adding New API Endpoints:**
+When adding new API functionality, you must create route handlers in both:
+1. **NestJS API** (`apps/api/src/<module>/`): The actual business logic
+2. **Next.js Proxy** (`apps/web/src/app/api/`): Route handler that proxies to NestJS
+
+Example proxy route handler structure:
+```typescript
+// apps/web/src/app/api/expenses/[id]/route.ts
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+
+const API_URL = process.env.API_URL || "http://localhost:5000/api";
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const cookieManager = await cookies();
+  const token = cookieManager.get("authToken")?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const res = await fetch(`${API_URL}/expenses/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  // Handle response...
+}
+```
 
 ## Important Notes
 

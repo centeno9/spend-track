@@ -43,6 +43,7 @@ export interface ExpensesQueryParams {
   page?: number;
   includeSummary?: boolean;
   tagIds?: string[];
+  sortOrder?: "asc" | "desc";
 }
 
 export interface CreateExpensePayload {

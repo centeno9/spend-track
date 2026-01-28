@@ -51,6 +51,7 @@ export class ExpensesService {
       endDate,
       includeSummary = false,
       tagIds,
+      sortOrder = 'asc',
     } = queryDto;
 
     const skip = page === 1 ? 0 : limit * (page - 1);
@@ -85,7 +86,7 @@ export class ExpensesService {
           tags: { include: { tag: true } },
         },
         orderBy: {
-          expensedAt: 'asc',
+          expensedAt: sortOrder,
         },
       }),
       this.prisma.expense.count({ where: whereCondition }),

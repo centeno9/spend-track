@@ -2,6 +2,7 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -40,4 +41,8 @@ export class ExpensesPaginationQueryDto {
   )
   @IsString({ each: true })
   tagIds?: string[];
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  sortOrder?: 'asc' | 'desc';
 }
