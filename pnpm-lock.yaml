@@ -148,6 +148,8 @@ importers:
         specifier: ^8.20.0
         version: 8.44.0(eslint@9.35.0(jiti@2.5.1))(typescript@5.9.2)
 
+  apps/api-pdf-extractor: {}
+
   apps/web:
     dependencies:
       '@radix-ui/react-avatar':

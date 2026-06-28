@@ -2,12 +2,14 @@
   "name": "expense-track",
   "private": true,
   "scripts": {
-    "dev:api": "pnpm --filter api start:dev",
+    "dev:api": "pnpm --filter api dev",
     "dev:web": "pnpm --filter web dev",
+    "dev:pdf": "pnpm --filter api-pdf-extractor dev",
     "dev:db": "docker compose -p spend-track -f infra/docker-compose.dev.yml up -d",
-    "dev": "pnpm dev:db && concurrently -k \"pnpm dev:api\" \"pnpm dev:web\"",
+    "dev": "pnpm dev:db && concurrently -k \"pnpm dev:api\" \"pnpm dev:web\" \"pnpm dev:pdf\"",
     "api": "pnpm --filter api",
-    "web": "pnpm --filter web"
+    "web": "pnpm --filter web",
+    "pdf": "pnpm --filter api-pdf-extractor"
   },
   "devDependencies": {
     "concurrently": "9.0.1"

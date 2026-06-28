@@ -1,0 +1,9 @@
+{
+  "name": "api-pdf-extractor",
+  "private": true,
+  "scripts": {
+    "setup": "node scripts/run.mjs setup",
+    "dev": "node scripts/run.mjs dev",
+    "start": "node scripts/run.mjs start"
+  }
+}
