@@ -1,14 +1,31 @@
 import pdfplumber
+from pdfplumber.page import Page
 
 from app.shared.pdf_utils import (
     DATE_RE,
     MONEY_RE,
-    get_table_settings,
     clean_rows,
     parse_money,
     parse_money_cents,
     parse_date_to_iso,
 )
+
+
+def get_table_settings(page: Page) -> dict:
+    """Table geometry for a BBVA statement.
+
+    BBVA draws the column separators as vector graphics but leaves the rows
+    implied by the text baselines, hence explicit vertical lines taken from the
+    page's own curves/edges and a text-based horizontal strategy.
+    """
+    return {
+        "vertical_strategy": "explicit",
+        "horizontal_strategy": "text",
+        "explicit_vertical_lines": page.curves + page.edges,
+        "intersection_tolerance": 15,
+        "snap_y_tolerance": 5,
+    }
+
 
 def extract(pdf_path: str) -> dict:
     pago_no_intereses = None

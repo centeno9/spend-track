@@ -21,16 +21,6 @@ SPANISH_MONTHS = {
 }
 
 
-def get_table_settings(page):
-    return {
-        "vertical_strategy": "explicit",
-        "horizontal_strategy": "text",
-        "explicit_vertical_lines": page.curves + page.edges,
-        "intersection_tolerance": 15,
-        "snap_y_tolerance": 5,
-    }
-
-
 def clean_rows(rows):
     return [r for r in rows if any(cell and cell.strip() for cell in r)]
 

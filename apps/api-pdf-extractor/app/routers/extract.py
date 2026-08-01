@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Form, UploadFile, File
 import tempfile
 
-from app.services import EXTRACTORS
+from app.services import EXTRACTORS, SUPPORTED_BANKS
 
 router = APIRouter()
 
@@ -13,13 +13,13 @@ async def extract_statement(
 ):
     extractor = EXTRACTORS.get(bank.lower())
     if not extractor:
-        return {"error": f"Unsupported bank: {bank}. Supported: {list(EXTRACTORS.keys())}"}
+        return {"error": f"Unsupported bank: {bank}. Supported: {SUPPORTED_BANKS}"}
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         tmp.write(await file.read())
         pdf_path = tmp.name
 
-    result = extractor(pdf_path)
+    result = extractor.extract(pdf_path)
     result["bank"] = bank.lower()
     result["filename"] = file.filename
     return result

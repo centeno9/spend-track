@@ -7,14 +7,15 @@ export interface BankOption {
 }
 
 /**
- * Banks shown in the import UI. Only BBVA is currently parseable; the rest are
- * displayed but disabled until the extractor supports them.
+ * Banks shown in the import UI. `id` must match a key in the extractor
+ * service's EXTRACTORS registry. The disabled ones are displayed but not yet
+ * parseable.
  */
 export const SUPPORTED_BANKS: BankOption[] = [
   { id: "bbva", label: "BBVA", enabled: true },
+  { id: "banorte", label: "Banorte", enabled: true },
   { id: "banamex", label: "Banamex", enabled: false },
   { id: "hsbc", label: "HSBC", enabled: false },
-  { id: "banorte", label: "Banorte", enabled: false },
   { id: "nu", label: "Nu", enabled: false },
 ];
 
