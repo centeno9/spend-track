@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, Bot, Settings2, SquareTerminal } from "lucide-react";
+import { BookOpen, Bot, FileUp, Settings2, SquareTerminal } from "lucide-react";
 import { NavUser } from "@/shared/components/nav-user";
 import {
   Sidebar,
@@ -34,6 +34,11 @@ const data = {
       title: "Tags",
       url: "/tags",
       icon: BookOpen,
+    },
+    {
+      title: "Import",
+      url: "/import",
+      icon: FileUp,
     },
     {
       title: "Settings",

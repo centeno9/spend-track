@@ -43,6 +43,30 @@ export class ExpensesService {
     return this.findOne(newExpense.id);
   }
 
+  async bulkCreate(expenses: CreateExpenseDto[], userId: string) {
+    const created = await this.prisma.$transaction((tx) =>
+      Promise.all(
+        expenses.map(({ title, expensedAt, total, tagIds = [], description }) =>
+          tx.expense.create({
+            data: {
+              title,
+              expensedAt,
+              totalCents: fromDecimalToCents(total),
+              description: description ?? null,
+              userId,
+              tags: {
+                create: tagIds.map((tagId) => ({ tagId })),
+              },
+            },
+            include: { user: true, tags: { include: { tag: true } } },
+          }),
+        ),
+      ),
+    );
+
+    return created.map((expense) => this.toDto(expense));
+  }
+
   async findAll(userId: string, queryDto: ExpensesPaginationQueryDto) {
     const {
       limit = 100,
@@ -143,7 +167,9 @@ export class ExpensesService {
           where: { id },
           data: {
             ...data,
-            ...(total !== undefined && { totalCents: fromDecimalToCents(total) }),
+            ...(total !== undefined && {
+              totalCents: fromDecimalToCents(total),
+            }),
             tags: {
               create: tagIds.map((tagId) => ({ tagId })),
             },

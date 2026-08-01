@@ -6,6 +6,8 @@ from app.shared.pdf_utils import (
     get_table_settings,
     clean_rows,
     parse_money,
+    parse_money_cents,
+    parse_date_to_iso,
 )
 
 def extract(pdf_path: str) -> dict:
@@ -44,9 +46,12 @@ def extract(pdf_path: str) -> dict:
                 amount = parse_money(monto)
                 expenses.append({
                     "fecha_operacion": fecha_op.strip(),
+                    "fecha_operacion_iso": parse_date_to_iso(fecha_op),
                     "fecha_cargo": (fecha_cargo or "").strip(),
+                    "fecha_cargo_iso": parse_date_to_iso(fecha_cargo or ""),
                     "descripcion": (descripcion or "").strip(),
                     "monto": amount,
+                    "monto_cents": parse_money_cents(monto),
                     "monto_raw": (monto or "").strip(),
                 })
             elif expenses and descripcion and descripcion.strip():

@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/shared/components/ui/button";
 import { ExpenseModal } from "@/shared/components/ExpenseModal";
-import { Plus } from "lucide-react";
+import { FileUp, Plus } from "lucide-react";
 
 export const DashHeader = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -16,13 +18,23 @@ export const DashHeader = () => {
           Overview of your spending habits
         </p>
       </div>
-      <Button
-        onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all hover:shadow-md active:scale-95"
-      >
-        <Plus size={18} />
-        New Expense
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => router.push("/import")}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all active:scale-95"
+        >
+          <FileUp size={18} />
+          Import from PDF
+        </Button>
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 bg-gray-900 hover:bg-black text-white px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-all hover:shadow-md active:scale-95"
+        >
+          <Plus size={18} />
+          New Expense
+        </Button>
+      </div>
 
       <ExpenseModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </header>

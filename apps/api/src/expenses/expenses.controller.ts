@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
+import { BulkCreateExpenseDto } from './dto/bulk-create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ExpensesPaginationQueryDto } from './dto/expenses-pagination-query.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -24,6 +25,17 @@ export class ExpensesController {
   @Post()
   create(@Request() req, @Body() createExpenseDto: CreateExpenseDto) {
     return this.expensesService.create(createExpenseDto, req.user.id);
+  }
+
+  @Post('bulk')
+  bulkCreate(
+    @CurrentUser() currentUser: UserRequest,
+    @Body() bulkCreateExpenseDto: BulkCreateExpenseDto,
+  ) {
+    return this.expensesService.bulkCreate(
+      bulkCreateExpenseDto.expenses,
+      currentUser.id,
+    );
   }
 
   @Get()
